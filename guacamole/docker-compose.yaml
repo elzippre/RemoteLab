@@ -1,5 +1,5 @@
-  ---
-  
+---
+services:
   guacd:
     image: guacamole/guacd
     container_name: guacd
@@ -25,6 +25,9 @@
       MYSQL_USER: guacamole_user
       MYSQL_PASSWORD: ${GUACAMOLE_PASSWORD}
       #TOTP_ENABLED: 'true'
+    ports:
+      - 8181:8080
+      
     links:
       - guacd
 
