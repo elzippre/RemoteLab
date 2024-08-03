@@ -1,0 +1,42 @@
+  ---
+  
+  guacd:
+    image: guacamole/guacd
+    container_name: guacd
+    hostname: guacd
+    restart: unless-stopped
+    volumes:
+      - ${DOCKERPATH}/guacamole/guacd/drive:/drive:rw
+      - ${DOCKERPATH}/guacamole/guacd/record:/record:rw
+
+
+  guacamole:
+    image: guacamole/guacamole
+    container_name: guacamole
+    hostname: guacamole
+    restart: unless-stopped
+    depends_on:
+      - guacd
+      - guacamole-db
+    environment:
+      GUACD_HOSTNAME: guacd
+      MYSQL_HOSTNAME: guacamole-db
+      MYSQL_DATABASE: guacamole_db
+      MYSQL_USER: guacamole_user
+      MYSQL_PASSWORD: ${GUACAMOLE_PASSWORD}
+      #TOTP_ENABLED: 'true'
+    links:
+      - guacd
+
+  guacamole-db:
+    image: mysql/mysql-server
+    container_name: guacamole-db
+    hostname: guacamole-db
+    environment:
+      MYSQL_USER: guacamole_user
+      MYSQL_PASSWORD: ${GUACAMOLE_PASSWORD}
+      MYSQL_DATABASE: guacamole_db
+    restart: unless-stopped
+    volumes:
+      - ${DOCKERPATH}/guacamole/initdb.sql:/initdb.sql				#DB configuration file
+      - ${DOCKERPATH}/guacamole/database:/var/lib/mysql/:rw
